@@ -959,7 +959,7 @@ class Performance_AppraisalsController extends Controller
             foreach ($teamMembers as $user) {
                 array_push( $teamMemberIds, $user->id );
             }
-            array_push($teamMemberIds, $userId);
+            
         }
         else {
             
@@ -967,7 +967,7 @@ class Performance_AppraisalsController extends Controller
             $teamMemberIds = $this->members;
         }
        
-    
+        array_push($teamMemberIds, $userId);
          
         
         
