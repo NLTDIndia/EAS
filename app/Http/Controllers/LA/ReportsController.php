@@ -251,11 +251,7 @@ class ReportsController extends Controller
             }
             array_push($teamMemberIds, $userId);
         }
-        else {
-            
-            $this->getMembers( $userId);
-            $teamMemberIds = $this->members;
-        }
+       
        
         $values =  DB::table('performance_appraisals')
                     ->leftJoin('performance_appraisals_details', 'performance_appraisals.id', '=', 'performance_appraisals_details.performance_appraisals_id')
@@ -338,132 +334,7 @@ class ReportsController extends Controller
     public function dtratings($id)
     {
         
-        $creationDate   = date("Y-m-d");
-        $evaluationCount = 0;
-        if ($id != '' && $id > 0) {
-            $evaluationCount =  DB::table('evaluation_periods')
-            ->select('evaluation_periods.*')
-            ->whereNull('deleted_at')
-            ->where('id','=',$id)
-            ->count();
-            $evaluation      =  DB::table('evaluation_periods')
-            ->select('evaluation_periods.*')
-            ->whereNull('deleted_at')
-            ->where('id','=',$id)
-            ->first();
-            $evaluationId       = $evaluation->id;
-            $evaluationStatus   = $evaluation->status;
-        }
-        else
-        {
-            $evaluationCount     = DB::table('evaluation_periods')
-            ->select('evaluation_periods.*')
-            ->whereNull('deleted_at')
-            ->where('start_date','<=',$creationDate)
-            ->where('end_date','>=',$creationDate)
-            ->count();
-            if ( $evaluationCount > 0) {
-                $evaluation      =  DB::table('evaluation_periods')
-                ->select('evaluation_periods.*')
-                ->whereNull('deleted_at')
-                ->orderBy('id', 'desc')
-                ->first();
-                $evaluationId       = $evaluation->id;
-                $evaluationStatus   = $evaluation->status;
-            } else
-            {
-                $evaluationId       = 0;
-                $evaluationStatus   = "";
-                
-            }
-        }
-        
-        
-        
-        $userId = Auth::user()->context_id;
-        $teamMemberIds = array();
-        
-        if (Entrust::hasRole('SUPER_ADMIN') || Entrust::hasRole('HR_MANAGER')) {
-            $teamMembers = DB::select("select id from employees ");
-            foreach ($teamMembers as $user) {
-                array_push( $teamMemberIds, $user->id );
-            }
-            array_push($teamMemberIds, $userId);
-        }
-        else {
-            
-            $this->getMembers( $userId);
-            $teamMemberIds = $this->members;
-        }
-        
-        
-        $values =  DB::table('employees')
-        ->leftJoin('performance_appraisals_details', 'employees.id', '=', 'performance_appraisals_details.employee_id')
-        ->leftJoin('performance_appraisals', 'performance_appraisals.id', '=', 'performance_appraisals_details.performance_appraisals_id')
-        ->leftJoin('departments', 'performance_appraisals_details.department', '=', 'departments.id')
-        ->leftJoin('evaluation_periods', 'performance_appraisals_details.evaluation_period', '=', 'evaluation_periods.id')
-        ->select('performance_appraisals.id', 'employees.name as employee_name', 'departments.name as department_name', 'performance_appraisals_details.manager_id', 'evaluation_periods.evaluation_period',  'performance_appraisals_details.start_date' , 'performance_appraisals_details.end_date', 'performance_appraisals_details.status')
-        ->whereIn('performance_appraisals_details.employee_id', $teamMemberIds)
-        ->whereNull('performance_appraisals.deleted_at')
-        ->where('performance_appraisals_details.evaluation_period', '=',$evaluationId);
-        
-         
-        $out = Datatables::of($values)->make();
-        $data = $out->getData();
-        
-        for($i=0; $i < count($data->data); $i++) {
-            for ($j=0; $j < count($this->listing_cols_data_table); $j++) {
-                if($j== 0) {
-                    $id =  $data->data[$i][0];
-                    
-                }
-                $col = $this->listing_cols_data_table[$j];
-                
-                if($col == 'manager')
-                    $data->data[$i][$j] = $this->getManager($data->data[$i][$j]);
-            }
-            if($this->show_action) {
-                $output = '';
-                if($col == 'employee') {
-                    
-                    $data->data[$i][$j] = '<a href="'.url( '/performance_appraisals/'.$id).'">'.$data->data[$i][$j].'</a>';
-                }
-                // Appraisal status
-                $status = '';
-                switch ($data->data[$i][7]) {
-                    case 0:
-                        $status = 'Goal setting is in progress.';
-                        break ;
-                    case 1:
-                        $status = 'Goal settings is completed by Appraisee';
-                        break ;
-                    case 2:
-                        $status = 'Goal settings is completed by Appraiser';
-                        break ;
-                    case 3:
-                        $status = '';
-                        break ;
-                    case 4:
-                        $status = 'Mid Year Revision is completed by Appraiser';
-                        break ;
-                    case 5:
-                        $status = 'Self rating is completed by Appraisee';
-                        break ;
-                    case 6:
-                        $status = ' Final Review is in progress';
-                        break ;
-                    case 7:
-                        $status = 'Final Review is completed by Appraiser';
-                        break ;
-                }
-                $data->data[$i][7] = $status;
-                $data->data[$i][] = (string)$output;
-            }
-        }
-        
-        
-        $out->setData($data);
-        return $out;
+       
     }
     
 }
