@@ -116,7 +116,7 @@
 						@else
 						<div style="padding-top: 20px;padding-right:10px">
 								<a href="{{ url('/employees/myprofile') }}" style="color:#fff;">{{ ucfirst(Auth::user()->name) }}</a>
-								&nbsp;&nbsp; <a href="{{ url('/logout') }}" style="color:#fff;">Sign out</a> 
+								&nbsp;&nbsp; <!-- <a href="{{ url('/logout') }}" style="color:#fff;">Sign out</a>  -->
 						</div>
 						@endrole
 						@role("SUPER_ADMIN")
@@ -158,7 +158,7 @@
 								<!-- 	<a href="{{ url('/users/') .'/'. Auth::user()->context_id }}" class="btn btn-default btn-flat">Profile</a> -->
 								</div>
 								  <div class="pull-right">
-							 <a href="{{ url('/logout') }}" class="btn btn-default btn-flat">Sign out</a> 
+							<!--  <a href="{{ url('/logout') }}" class="btn btn-default btn-flat">Sign out</a>  -->
 								</div>  
 							</li>
 						</ul>

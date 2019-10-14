@@ -49,10 +49,7 @@ class Performance_AppraisalsController extends Controller
     {
         $creationDate   = date("Y-m-d");
         $userId = Auth::user()->context_id;
-        $roleId = DB::table('role_user')->where([
-            ['user_id', '=', $userId]
-        ])->value('role_id');
-        
+        $roleId = DB::table('role_user')->where([['user_id', '=', $userId]])->value('role_id');
         $evaluation     = DB::table('evaluation_periods')
                             ->select('id', 'evaluation_period', 'status')
                             ->whereNull('deleted_at')
@@ -88,7 +85,6 @@ class Performance_AppraisalsController extends Controller
                         ->whereIn('manager_id', $teams)
                         ->count();
         
-        
         if($memberCount > 0  ||  $docuemntCount > 0 || Entrust::hasRole('SUPER_ADMIN')) {
             $module = Module::get('Performance_Appraisals');
             
@@ -121,8 +117,6 @@ class Performance_AppraisalsController extends Controller
     {
         $creationDate       = date("Y-m-d");
         $userId             = Auth::user()->context_id;
-        //lastEligibleDay  	= date("Y-m-d",strtotime("last year December 31st"));
-        //$lastEligibleDay    = date("Y-m-d",strtotime("last day of December this year"));
         $evaluationCount    = DB::table('evaluation_periods')
                                 ->select('id', 'evaluation_period', 'status')
                                 ->whereNull('deleted_at')
@@ -133,7 +127,6 @@ class Performance_AppraisalsController extends Controller
                                 ->whereNull('deleted_at')
                                 ->where('manager', '=', $userId)
                                 ->count();
-        
         
         if($evaluationCount > 0 ) {
             $evaluation   = DB::table('evaluation_periods')
@@ -217,8 +210,6 @@ class Performance_AppraisalsController extends Controller
                     return redirect()->back()->withErrors('Error: Invalid file type. Please choose valid xlsx file in the department page.');
                 }
                 
-                
-                
                 $file = 'storage/uploads/'.$templateName;
                 $tempData = [];
                 
@@ -247,17 +238,10 @@ class Performance_AppraisalsController extends Controller
                         ['employee_id', '=', $userId],
                         ['manager_id', '=', $managerId]
                     ])->count();
-                    
-                    
-                    
+                                                          
                     if ($evaluationId > 0 || $accessCount > 0) { // add $records == 0 if you want to restrict 1-1 with manager
                         
-                        $roleId = DB::table('role_user')->where([
-                            ['user_id', '=', $userId]
-                        ])->value('role_id');
-                        
-                        
-                        
+                        $roleId = DB::table('role_user')->where([['user_id', '=', $userId]])->value('role_id');
                         $employeeName = DB::table('employees')->where([
                             ['id', '=', $userId]
                         ])->value('name');
@@ -389,9 +373,7 @@ class Performance_AppraisalsController extends Controller
                                                 ->where('end_date','>=',$creationDate)
                                                 ->first();
                     }
-                    
-                    
-                    
+                                      
                     // Checking the employee appraisal data in the performance appraisal details table
                     $dataCount =   DB::table('performance_appraisals_details')
                                     ->whereNull('deleted_at')
@@ -489,11 +471,7 @@ class Performance_AppraisalsController extends Controller
             $teams = $this->members;
             array_push($teams, $userId);
             //Check the current Profile is belongs to logged in user or his team members
-            
-            
-            
-            // if ($empId == Auth::user()->context_id  || in_array($empId, $teams) || Entrust::hasRole('SUPER_ADMIN') ) {
-            if ($empId == Auth::user()->context_id  || in_array($managerId, $teams)    || Entrust::hasRole('SUPER_ADMIN') || Entrust::hasRole('HR_MANAGER')) {
+             if ($empId == Auth::user()->context_id  || in_array($managerId, $teams)    || Entrust::hasRole('SUPER_ADMIN') || Entrust::hasRole('HR_MANAGER')) {
                 if(Module::hasAccess("Performance_Appraisals", "view")) {
                     
                     $employeeName = DB::table('employees')->where([
@@ -561,12 +539,6 @@ class Performance_AppraisalsController extends Controller
             $submitButtonText = "Submit";
             
             // Getting team members ids
-            /* $values = DB::select("select id from (select * from employees order by manager, id) employees,
-            (select @pv :=". Auth::user()->context_id.") initialisation where find_in_set(manager, @pv) > 0 and @pv := concat(@pv, ',', id)");
-            foreach ($values as $val) {
-                array_push($teams, $val->id);
-            } */
-            
             $this->getMembers( $userId);
             $teams = $this->members;
             array_push($teams, $userId);
@@ -589,13 +561,9 @@ class Performance_AppraisalsController extends Controller
             $startDate          = date_format(date_create($performanceData->start_date), "d-m-Y");
             $endDate            = date_format(date_create($performanceData->end_date), "d-m-Y");
             
-            
-            
             //Check the current Profile is belongs to logged in user or his team members
             if ($empId == Auth::user()->context_id  || in_array($managerId, $teams) || Entrust::hasRole('SUPER_ADMIN') || Entrust::hasRole('HR_MANAGER')   ) {
                 if(Module::hasAccess("Performance_Appraisals", "edit")) {
-                    //$performanceappraisal = Performance_Appraisal::find($id);
-                    
                     $evaluation = DB::table('evaluation_periods')->where([
                         ['id', '=', $evaluation_period],
                     ])->first();
@@ -968,8 +936,6 @@ class Performance_AppraisalsController extends Controller
         }
        
         array_push($teamMemberIds, $userId);
-         
-        
         
         if (Entrust::hasRole('SUPER_ADMIN')) {
             
@@ -986,8 +952,6 @@ class Performance_AppraisalsController extends Controller
                        
         }
         else {
-           
-            
             $values =  DB::table('performance_appraisals')
                         ->leftJoin('performance_appraisals_details', 'performance_appraisals.id', '=', 'performance_appraisals_details.performance_appraisals_id')
                         ->leftJoin('employees', 'performance_appraisals_details.employee_id', '=', 'employees.id')
