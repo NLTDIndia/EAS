@@ -86,7 +86,7 @@
     $(document).ready(function (){   
     	var table = 	$("#example1").DataTable({
     		processing: true,
-            serverSide: true,
+            serverSide: false,
             lengthChange: false,
             ajax: "{{ url('/reports_performance_appraisal_dt_ajax/'.$evaluationId)}}",
             'type': 'GET',
@@ -99,9 +99,9 @@
     		  columnDefs: [  {visible:false, targets:[0]}],
     		  dom: 'Bfrtip',
     		  buttons: [
-					{ extend: 'excelHtml5',filename: '<?php echo "EAS - Overall Report -".date("d-m-Y"); ?>',exportOptions:{columns: [1, 2, 3, 4, 5, 6, 7]}},
+					{ extend: 'excelHtml5',filename: '<?php echo "EAS Documents -".date("d-m-Y"); ?>',exportOptions:{columns: [1, 2, 3, 4, 5, 6, 7]}},
 					{ extend: 'pdfHtml5',orientation: 'landscape',
- 					  pageSize: 'A4',filename: '<?php echo "EAS - Overall Report -".date("d-m-Y"); ?>',
+ 					  pageSize: 'A4',filename: '<?php echo "EAS Documents -".date("d-m-Y"); ?>',
 					  exportOptions:{columns: [1, 2, 3, 4, 5, 6, 7]}
 					},
 			  ],

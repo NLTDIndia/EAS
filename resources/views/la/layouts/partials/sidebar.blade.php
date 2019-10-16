@@ -86,7 +86,7 @@
                 <li class="treeview <?php echo ($routeName == 'reports.index' || $routeName == 'reports.ratings.index' ) ? 'active':'' ?>">
                 	<a href="#"><i class="fa fa-bar-chart-o"></i><span>Reports</span><span class="pull-right-container"><i class="fa fa-angle-left pull-right"></i></span></a>
                 	<ul class="treeview-menu">
-                	 	<li class="<?php echo ($routeName == 'reports.index') ? 'active':'' ?>"><a href="{{ url('/reports') }}"><i class='fa fa-file-word-o'></i> <span>Overall Documents</span></a></li>
+                	 	<li class="<?php echo ($routeName == 'reports.index') ? 'active':'' ?>"><a href="{{ url('/reports') }}"><i class='fa fa-file-word-o'></i> <span>Documents</span></a></li>
                 		<!--<li class="<?php //echo  ($routeName == 'reports.ratings.index') ? 'active':'' ?>"><a href="{{ url('/reports/ratings') }}"><i class='fa fa fa-star'></i> <span>Employee Ratings</span></a></li>-->
                 	</ul>
                 </li>
