@@ -70,7 +70,8 @@ class AuthController extends Controller
        if (Auth::attempt(['corp_id' => $compName, 'password' => $compName])) {
             // Authentication passed...
             return redirect()->intended('dashboard');
-       }else echo 'Login Failed. Corp Id is.'.$compName;    
+       } 
+       else echo 'Login Failed for .'.$compName;  
           /*   $roleCount = Role::count();
          if($roleCount != 0) {
          $userCount = User::count();
