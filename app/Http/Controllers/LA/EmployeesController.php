@@ -150,7 +150,6 @@ class EmployeesController extends Controller
             $user = User::create([
                 'name' => $request->name,
                 'email' => $request->email,
-                //'password' => bcrypt($password),
                 'corp_id' => strtolower($request->corp_id),
                 'password'=> bcrypt(strtolower($request->corp_id)),
                 'context_id' => $employee_id,
