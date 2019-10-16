@@ -76,41 +76,56 @@
 @endsection
 @push('styles')
 <link rel="stylesheet" type="text/css" href="{{ asset('la-assets/plugins/datatables/datatables.min.css') }}"/>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/1.6.0/css/buttons.bootstrap.min.css">
 @endpush
 
 @push('scripts')
 <script src="{{ asset('la-assets/plugins/datatables/datatables.min.js') }}"></script>
 <script>
-var _token = $('input[name="_token"]').val();
-$(document).ready(function (){   
-	 
-	 var table = 	$("#example1").DataTable({
-		processing: true,
-        serverSide: true,
-        ajax: "{{ url('/reports_performance_appraisal_dt_ajax/'.$evaluationId)}}",
-        'type': 'GET',
-        "order": [[ 1, "asc" ]],
-		language: {
-			lengthMenu: "_MENU_",
-			search: "_INPUT_",
-			searchPlaceholder: "Search"
-		},
-		  columnDefs: [  {visible:false, targets:[0]}],
- });
-  
-//Handle drop down evalution period value change
-$( "select[name='evaluationItems']" ).change(function() {
-  // Check input( $( this ).val() ) for validity here
-   var optionSelected = $("option:selected", this).value;
-   var valueSelected = this.value;
-   // table.ajax.reload();
-   var link = "{{ url('/reports_performance_appraisal_dt_ajax/')}}";
-  
-   table.ajax.url(link+"/"+valueSelected).load();
-});
-
- 
- 
-}); 
+    var _token = $('input[name="_token"]').val();
+    $(document).ready(function (){   
+    	var table = 	$("#example1").DataTable({
+    		processing: true,
+            serverSide: true,
+            lengthChange: false,
+            ajax: "{{ url('/reports_performance_appraisal_dt_ajax/'.$evaluationId)}}",
+            'type': 'GET',
+            "order": [[ 1, "asc" ]],
+    		language: {
+    			lengthMenu: "_MENU_",
+    			search: "_INPUT_",
+    			searchPlaceholder: "Search"
+    		},
+    		  columnDefs: [  {visible:false, targets:[0]}],
+    		  dom: 'Bfrtip',
+    		  buttons: [
+					{ extend: 'excelHtml5',filename: '<?php echo "EAS - Overall Report -".date("d-m-Y"); ?>',exportOptions:{columns: [1, 2, 3, 4, 5, 6, 7]}},
+					{ extend: 'pdfHtml5',orientation: 'landscape',
+ 					  pageSize: 'A4',filename: '<?php echo "EAS - Overall Report -".date("d-m-Y"); ?>',
+					  exportOptions:{columns: [1, 2, 3, 4, 5, 6, 7]}
+					},
+			  ],
+    	});
+    	 table.buttons().container()
+         .appendTo( '#example_wrapper .col-sm-6:eq(0)' )
+      
+        //Handle drop down evalution period value change
+        $( "select[name='evaluationItems']" ).change(function() {
+          // Check input( $( this ).val() ) for validity here
+           var optionSelected = $("option:selected", this).value;
+           var valueSelected = this.value;
+           var link = "{{ url('/reports_performance_appraisal_dt_ajax/')}}";
+           table.ajax.url(link+"/"+valueSelected).load();
+        }); 
+   }); 
 </script>
+<script type="text/javascript" language="javascript" src="https://cdn.datatables.net/buttons/1.6.0/js/dataTables.buttons.min.js"></script>
+<script type="text/javascript" language="javascript" src="https://cdn.datatables.net/buttons/1.6.0/js/buttons.bootstrap.min.js"></script>
+<script type="text/javascript" language="javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+<script type="text/javascript" language="javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+<script type="text/javascript" language="javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+<script type="text/javascript" language="javascript" src="https://cdn.datatables.net/buttons/1.6.0/js/buttons.html5.min.js"></script>
+<script type="text/javascript" language="javascript" src="https://cdn.datatables.net/buttons/1.6.0/js/buttons.print.min.js"></script>
+<script type="text/javascript" language="javascript" src="https://cdn.datatables.net/buttons/1.6.0/js/buttons.colVis.min.js"></script>
+
 @endpush
