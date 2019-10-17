@@ -87,7 +87,7 @@
     	var table = 	$("#example1").DataTable({
     		processing: true,
             serverSide: false,
-            lengthChange: false,
+            lengthChange: true,
             ajax: "{{ url('/reports_performance_appraisal_dt_ajax/'.$evaluationId)}}",
             'type': 'GET',
             "order": [[ 1, "asc" ]],
@@ -97,12 +97,12 @@
     			searchPlaceholder: "Search"
     		},
     		  columnDefs: [  {visible:false, targets:[0]}],
-    		  dom: 'Bfrtip',
+    		  dom: "<'row'<'col-md-4'l>><'row'<'col-md-8'B><'col-md-4'f>>" +'rtip',
     		  buttons: [
-					{ extend: 'excelHtml5',filename: '<?php echo "EAS Documents -".date("d-m-Y"); ?>',exportOptions:{columns: [1, 2, 3, 4, 5, 6, 7]}},
+					{ extend: 'excelHtml5',filename: '<?php echo "EAS Documents -".date("d-m-Y"); ?>',exportOptions:{columns: [1, 2, 3, 4, 5, 6, 7, 8]}},
 					{ extend: 'pdfHtml5',orientation: 'landscape',
  					  pageSize: 'A4',filename: '<?php echo "EAS Documents -".date("d-m-Y"); ?>',
-					  exportOptions:{columns: [1, 2, 3, 4, 5, 6, 7]}
+					  exportOptions:{columns: [1, 2, 3, 4, 5, 6, 7, 8]}
 					},
 			  ],
     	});

@@ -24,7 +24,7 @@ class ReportsController extends Controller
     public $show_action = true;
     public $members = array();
     public $listing_cols = ['id' ];
-    public $listing_cols_data_table = ['id',  'employee', 'department', 'manager', 'evaluation period', 'start date', 'end date', 'status'];
+    public $listing_cols_data_table = ['id', 'employee id', 'employee', 'department', 'manager', 'evaluation period', 'start date', 'end date', 'status'];
     
      /**
      * Create a new controller instance.
@@ -252,17 +252,21 @@ class ReportsController extends Controller
             array_push($teamMemberIds, $userId);
         }
        
-       
-        $values =  DB::table('performance_appraisals')
-                    ->leftJoin('performance_appraisals_details', 'performance_appraisals.id', '=', 'performance_appraisals_details.performance_appraisals_id')
-                    ->leftJoin('employees', 'performance_appraisals_details.employee_id', '=', 'employees.id')
-                    ->leftJoin('departments', 'performance_appraisals_details.department', '=', 'departments.id')
-                    ->leftJoin('evaluation_periods', 'performance_appraisals_details.evaluation_period', '=', 'evaluation_periods.id')
-                    ->select('performance_appraisals.id', 'employees.name as employee_name', 'departments.name as department_name', 'performance_appraisals_details.manager_id', 'evaluation_periods.evaluation_period',  'performance_appraisals_details.start_date' , 'performance_appraisals_details.end_date', 'performance_appraisals_details.status')
-                    ->whereIn('performance_appraisals_details.manager_id', $teamMemberIds)
+       $values =  DB::table('evaluation_periods')
+                   ->leftJoin('performance_appraisals_details', 'evaluation_periods.id' , '=', 'performance_appraisals_details.evaluation_period' )
+                   ->leftJoin('performance_appraisals', 'performance_appraisals_details.id', '=' ,'performance_appraisals.id' )
+                   ->rightJoin('employees', 'performance_appraisals_details.employee_id', '=', 'employees.id')
+                   ->leftJoin('departments', 'employees.dept', '=', 'departments.id')
+                   ->select('performance_appraisals_details.performance_appraisals_id', 'employees.emp_id as employee_id',  'employees.name as employee_name', 'departments.name as department_name',
+                    DB::Raw('IFNULL(`performance_appraisals_details`.`manager_id`, `employees`.`manager` )'),
+                    DB::Raw('(SELECT `evaluation_period` FROM evaluation_periods WHERE id = '.$evaluationId.')'),
+                    DB::Raw('IFNULL(`performance_appraisals_details`.`start_date`, (SELECT `start_date` FROM evaluation_periods WHERE id = '.$evaluationId.'))'),
+                    DB::Raw('IFNULL(`performance_appraisals_details`.`end_date`, (SELECT `end_date` FROM evaluation_periods WHERE id = '.$evaluationId.'))'),
+                    DB::Raw('IFNULL(`performance_appraisals_details`.`status`, "-1" )'))
+                    ->whereNull('employees.deleted_at')
                     ->whereNull('performance_appraisals.deleted_at')
-                    ->where( 'performance_appraisals_details.status', '>', '0' )
-                    ->where('performance_appraisals_details.evaluation_period', '=',$evaluationId);
+                    ->where('evaluation_periods.id', '=',$evaluationId)
+                    ->orWhere('performance_appraisals_details.evaluation_period', '=',null); 
         
         $out = Datatables::of($values)->make();
         $data = $out->getData();
@@ -278,7 +282,7 @@ class ReportsController extends Controller
                         if($col == 'manager')
                             $data->data[$i][$j] = $this->getManager($data->data[$i][$j]);
                             if($col == 'start date' || $col == 'end date')
-                                $data->data[$i][$j] = date_format(date_create($data->data[$i][$j]), "d-m-Y");
+                             	$data->data[$i][$j] = date_format(date_create($data->data[$i][$j]), "d-m-Y");
             }
             if($this->show_action) {
                 $output = '';
@@ -290,7 +294,10 @@ class ReportsController extends Controller
                 }
                 // Appraisal status
                 $status = '';
-                switch ($data->data[$i][7]) {
+                switch ($data->data[$i][8]) {
+                    case -1:
+                        $status = 'Goal setting is not started.';
+                        break ;
                     case 0:
                         $status = 'Goal setting is in progress.';
                         break ;
@@ -316,7 +323,11 @@ class ReportsController extends Controller
                         $status = 'Final Review is completed by Appraiser';
                         break ;
                 }
-                $data->data[$i][7] = $status;
+                if($data->data[$i][0] == 0 || $data->data[$i][0] == null) 
+                    $status = 'Goal setting is not started.';
+                
+                $data->data[$i][8] = $status;
+                
                 $data->data[$i][] = (string)$output;
             }
         }
