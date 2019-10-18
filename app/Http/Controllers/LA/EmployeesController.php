@@ -395,7 +395,7 @@ class EmployeesController extends Controller
             }
             else {
                 // Redirecting to index() method
-                return redirect()->route('.employees.index')->withErrors('Error: Could not delete this record. Some employees are reporting to this employee.');
+                return redirect()->route('employees.index')->withErrors('Error: Could not delete this record. Some employees are reporting to this employee.');
                 
             }
             
