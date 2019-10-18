@@ -266,7 +266,9 @@ class ReportsController extends Controller
                     ->whereNull('employees.deleted_at')
                     ->whereNull('performance_appraisals.deleted_at')
                     ->where('evaluation_periods.id', '=',$evaluationId)
-                    ->orWhere('performance_appraisals_details.evaluation_period', '=',null); 
+                    ->orWhere('performance_appraisals_details.evaluation_period', '=',null)
+                    ->whereNull('employees.deleted_at')
+                    ->whereNull('performance_appraisals.deleted_at'); 
         
         $out = Datatables::of($values)->make();
         $data = $out->getData();
