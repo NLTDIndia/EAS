@@ -40,8 +40,7 @@
 	  
     	<form id="frm-example" action="#" method="POST">
         	<input type="hidden" id='hdnIds' name="hdnIds">
-        	{{--@if($evaluationStatus == 'Final-Review' || $evaluationStatus == 'Completed')--}}
-        	 @if(  ( Entrust::hasRole('SUPER_ADMIN') &&   Entrust::hasRole('HR_MANAGER'))) 
+        	 @if(  ( Entrust::hasRole('SUPER_ADMIN'))) 
         		<div class="pull-right"><input type="submit" id="approve" class="btn btn-success" value="Complete"></div><br><br>
              @endif 
            
@@ -51,7 +50,7 @@
             		<tr class="success">
             		   
             		 	@foreach( $listing_cols_data_table as $col )
-                		 	@if( ucfirst($col) == "Id")
+                		 	@if( ucfirst($col) == "Id" && Entrust::hasRole('SUPER_ADMIN'))
                 		 		<th><input name="select_all" value="1" id="example-select-all" type="checkbox" /></th>
                 		 	@else
                 				<th>{{ $module->fields[$col]['label'] or ucfirst($col) }}</th>
@@ -98,7 +97,7 @@ $(document).ready(function (){
 	 
 	 var table = 	$("#example1").DataTable({
 		processing: true,
-        serverSide: true,
+        serverSide: false,
         ajax: "{{ url('/performance_appraisal_dt_ajax/'.$evaluationId)}}",
         'type': 'GET',
         "order": [[ 1, "asc" ]],
@@ -107,11 +106,10 @@ $(document).ready(function (){
 			search: "_INPUT_",
 			searchPlaceholder: "Search"
 		},
-		 @if(  (!Entrust::hasRole('SUPER_ADMIN') &&  !Entrust::hasRole('HR_MANAGER'))) 
+		 @if(  (!Entrust::hasRole('SUPER_ADMIN'))) 
 			columnDefs: [ { orderable: false, targets: [0] }, {visible:false, targets:[0]}],
 		 @else 	columnDefs: [ { orderable: false, targets: [0] }],
 		 @endif 
-		//columnDefs: [ { orderable: false, targets: [0] }, {visible:false, targets:[7]}],
 	});
    	$("#performance_appraisal-add-form").validate({
     });
@@ -163,16 +161,7 @@ $('#approve').on('click', function(e){
        if($.contains(document, this)){ 
           // If checkbox is checked
           if(this.checked){ 
-           //   ids =  $('#hdnIds').val();
-              ids += this.value + ",";
-              
-             // Create a hidden element 
-             /*  $(form).append(
-                $('<input>')
-                   .attr('type', 'text')
-                   .attr('name', this.name)
-                   .val(this.value)
-             );   */
+            ids += this.value + ",";
           }
        } 
     });
