@@ -114,7 +114,7 @@
                         					<div class="row">
                             					 <div class="form-group">
                             						<div class="col-md-3"><label for="goal_1"><b>Measurement : </b></label></div>
-                            						<div class="col-md-9"><?php echo $performance_appraisal->{'measurement_'.$i} ; ?></div>
+                            						<div class="col-md-9"><?php echo nl2br($performance_appraisal->{'measurement_'.$i}) ; ?></div>
                             					</div>
                         					</div> 
                         					
@@ -123,7 +123,7 @@
                             					<div class="row">
                                 					 <div class="form-group">
                                 						<div class="col-md-3"><label for="goal_1"><b>Comments by Appraisee : </b></label></div>
-                                						<div class="col-md-9"><?php echo $performance_appraisal->{'comments_by_appraisee_'.$i} ; ?></div>
+                                						<div class="col-md-9"><?php echo nl2br($performance_appraisal->{'comments_by_appraisee_'.$i}) ; ?></div>
                                 					</div>
                             					</div> 
                             					<div class="row">
@@ -137,7 +137,7 @@
                             					 	<div class="row">
                                     					 <div class="form-group">
                                     						<div class="col-md-3"><label for="goal_1"><b>Comments by Appraiser : </b></label></div>
-                                    						<div class="col-md-9"><?php echo $performance_appraisal->{'comments_by_appraiser_'.$i} ; ?></div>
+                                    						<div class="col-md-9"><?php echo nl2br($performance_appraisal->{'comments_by_appraiser_'.$i}) ; ?></div>
                                     					</div>
                                 					</div> 
                                 					<div class="row">
@@ -213,7 +213,7 @@
                             					<div class="row">
                                 					 <div class="form-group">
                                 						<div class="col-md-3"><label for="goal_1"><b>Comments by Appraisee : </b></label></div>
-                                						<div class="col-md-9"><?php echo $performance_appraisal->{'comments_by_appraisee_'.$i} ; ?></div>
+                                						<div class="col-md-9"><?php echo nl2br($performance_appraisal->{'comments_by_appraisee_'.$i}) ; ?></div>
                                 					</div>
                             					</div> 
                             					<div class="row">
@@ -227,7 +227,7 @@
                             					 	<div class="row">
                                     					 <div class="form-group">
                                     						<div class="col-md-3"><label for="goal_1"><b>Comments by Appraiser : </b></label></div>
-                                    						<div class="col-md-9"><?php echo $performance_appraisal->{'comments_by_appraiser_'.$i} ; ?></div>
+                                    						<div class="col-md-9"><?php echo nl2br($performance_appraisal->{'comments_by_appraiser_'.$i}) ; ?></div>
                                     					</div>
                                 					</div> 
                                 					<div class="row">
@@ -301,7 +301,7 @@
                             					<div class="row">
                                 					 <div class="form-group">
                                 						<div class="col-md-3"><label for="goal_1"><b>Comments by Appraisee : </b></label></div>
-                                						<div class="col-md-9"><?php echo $performance_appraisal->{'comments_by_appraisee_'.$i} ; ?></div>
+                                						<div class="col-md-9"><?php echo nl2br($performance_appraisal->{'comments_by_appraisee_'.$i}) ; ?></div>
                                 					</div>
                             					</div> 
                             					<div class="row">
@@ -315,7 +315,7 @@
                             					 	<div class="row">
                                     					 <div class="form-group">
                                     						<div class="col-md-3"><label for="goal_1"><b>Comments by Appraiser : </b></label></div>
-                                    						<div class="col-md-9"><?php echo $performance_appraisal->{'comments_by_appraiser_'.$i} ; ?></div>
+                                    						<div class="col-md-9"><?php echo nl2br($performance_appraisal->{'comments_by_appraiser_'.$i}) ; ?></div>
                                     					</div>
                                 					</div> 
                                 					<div class="row">
@@ -511,7 +511,7 @@
                             	<div class="row">
                                     <div class="form-group">
                                     	 <label for="overall_comments_by_appraiser">Overall Comments by Appraisee :</label>
-                                    	 <textarea class="form-control valid" readonly ="true"  placeholder="Enter Overall Comments by Appraisee" required="1" cols="30" rows="3" name="overall_comments_by_appraisee" aria-required="true" aria-invalid="false"><?php echo $performance_appraisal->overall_comments_by_appraisee;?></textarea>
+                                    	 <textarea class="form-control valid" readonly ="true"  placeholder="Enter Overall Comments by Appraisee" required="1" cols="30" rows="3" name="overall_comments_by_appraisee" aria-required="true" aria-invalid="false"><?php echo nl2br($performance_appraisal->overall_comments_by_appraisee);?></textarea>
                                     </div>
                                 </div>
                                 <div class="row">     
@@ -524,7 +524,7 @@
                                 <div class="row">
                                     <div class="form-group">
                                     	 <label for="overall_comments_by_appraiser">Overall Comments by Appraiser :</label>
-                                    	 <textarea class="form-control valid" readonly ="true"  placeholder="Enter Overall Comments by Appraiser" required="1" cols="30" rows="3" name="overall_comments_by_appraiser" aria-required="true" aria-invalid="false"><?php echo $performance_appraisal->overall_comments_by_appraiser;?></textarea>
+                                    	 <textarea class="form-control valid" readonly ="true"  placeholder="Enter Overall Comments by Appraiser" required="1" cols="30" rows="3" name="overall_comments_by_appraiser" aria-required="true" aria-invalid="false"><?php echo nl2br($performance_appraisal->overall_comments_by_appraiser);?></textarea>
                                     </div>
                                 </div>
                                 <div class="row">     
