@@ -373,19 +373,11 @@ class EmployeesController extends Controller
         if(Module::hasAccess("Employees", "delete")) {
             //Validating whether the employee is a manager or not
             $recordCount = DB::table('employees')->select('id')
-            ->where('manager', '=', $id)
-            ->count();
+                        ->where('manager', '=', $id)
+                        ->whereNull('deleted_at')
+                        ->count();
             if ($recordCount ==0 )  {
                 Employee::find($id)->delete();
-                // User::find($id)->delete();
-                
-                
-                //Updating appraisal performance deleted at field
-                /* DB::table('performance_appraisals')
-                 ->where('employee_id', $id)
-                 ->where('status', '=', '0')
-                 ->update(['deleted_at' => date("Y-m-d H:i:s")]);
-                 */
                 DB::table('performance_appraisals_details')
                 ->where('employee_id', $id)
                 ->where('status', '=', '0')
@@ -658,15 +650,16 @@ class EmployeesController extends Controller
     public function getMembers($employeeId ) {
         
         $child = DB::table('employees')
-        ->select('id')
-        ->whereNull('deleted_at')
-        ->whereNull('date_left')
-        ->where('manager','=', $employeeId)
-        ->orderBy('id', 'desc')
-        ->get();
+                ->select('id')
+                ->whereNull('deleted_at')
+                ->whereNull('date_left')
+                ->where('manager','=', $employeeId)
+                ->orderBy('id', 'desc')
+                ->get();
         foreach($child as $ch) {
             array_push($this->members, $ch->id);
-            $this->getMembers($ch->id);
+            if($employeeId != $ch->id)
+                $this->getMembers($ch->id);
         }
         
     }
@@ -811,11 +804,10 @@ class EmployeesController extends Controller
                             //Update manager id for the employee record
                             foreach ($tempData as $temp) {
                                 $mangerCount   = DB::table('employees')->select('id')
-                                ->where('emp_id', '=', $temp->reporting_to)
-                                ->count();
+                                                ->where('emp_id', '=', $temp->reporting_to)
+                                                ->count();
                                 
                                 if( $mangerCount  > 0 ) {
-                                    
                                     $managerId = DB::table('employees')->where([
                                         ['emp_id', '=', $temp->reporting_to]
                                     ])->value('id');
