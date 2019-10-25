@@ -97,9 +97,8 @@ class ReportsController extends Controller
                         ->whereIn('manager_id', $teams)
                         ->count();
         
-        if($memberCount > 0  ||  $documentCount > 0 || Entrust::hasRole('SUPER_ADMIN') || Entrust::hasRole('HR_MANAGER')) {
-          if(1==1) {
-                return View('la.reports.custom-index', [
+        if( Entrust::hasRole('SUPER_ADMIN') || Entrust::hasRole('HR_MANAGER')) {
+            return View('la.reports.custom-index', [
                     'show_actions' => $this->show_action,
                     'listing_cols' => $this->listing_cols,
                     'listing_cols_data_table' => $this->listing_cols_data_table,
@@ -113,7 +112,6 @@ class ReportsController extends Controller
                 return redirect('/dashboard');
             }
         }
-    }
     
     public function ratings()
     { 
