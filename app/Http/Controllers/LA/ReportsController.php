@@ -97,9 +97,8 @@ class ReportsController extends Controller
                         ->whereIn('manager_id', $teams)
                         ->count();
         
-        if($memberCount > 0  ||  $documentCount > 0 || Entrust::hasRole('SUPER_ADMIN') || Entrust::hasRole('HR_MANAGER')) {
-          if(1==1) {
-                return View('la.reports.custom-index', [
+        if(Entrust::hasRole('SUPER_ADMIN') || Entrust::hasRole('HR_MANAGER')) {
+           return View('la.reports.custom-index', [
                     'show_actions' => $this->show_action,
                     'listing_cols' => $this->listing_cols,
                     'listing_cols_data_table' => $this->listing_cols_data_table,
@@ -112,8 +111,7 @@ class ReportsController extends Controller
             } else {
                 return redirect('/dashboard');
             }
-        }
-    }
+     }
     
     public function ratings()
     { 
@@ -170,15 +168,16 @@ class ReportsController extends Controller
     public function getMembers($employeeId ) {
         
         $child = DB::table('employees')
-        ->select('id')
-        ->whereNull('deleted_at')
-        ->whereNull('date_left')
-        ->where('manager','=', $employeeId)
-        ->orderBy('id', 'desc')
-        ->get();
+                ->select('id')
+                ->whereNull('deleted_at')
+                ->whereNull('date_left')
+                ->where('manager','=', $employeeId)
+                ->orderBy('id', 'desc')
+                ->get();
         foreach($child as $ch) {
             array_push($this->members, $ch->id);
-            $this->getMembers($ch->id);
+            if($employeeId != $ch->id)
+                $this->getMembers($ch->id);
         }
         
     }
@@ -225,10 +224,10 @@ class ReportsController extends Controller
                                     ->count();
             if ( $evaluationCount > 0) {
                 $evaluation      =  DB::table('evaluation_periods')
-                                ->select('evaluation_periods.*')
-                                ->whereNull('deleted_at')
-                                ->orderBy('id', 'desc')
-                                ->first();
+                                    ->select('evaluation_periods.*')
+                                    ->whereNull('deleted_at')
+                                    ->orderBy('id', 'desc')
+                                    ->first();
                 $evaluationId       = $evaluation->id;
                 $evaluationStatus   = $evaluation->status;
             } else
@@ -298,10 +297,10 @@ class ReportsController extends Controller
                 $status = '';
                 switch ($data->data[$i][8]) {
                     case -1:
-                        $status = 'Goal setting is not started.';
+                        $status = 'Goal setting is not started';
                         break ;
                     case 0:
-                        $status = 'Goal setting is in progress.';
+                        $status = 'Goal setting is in progress';
                         break ;
                     case 1:
                         $status = 'Goal settings is completed by Appraisee';
