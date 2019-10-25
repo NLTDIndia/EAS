@@ -57,7 +57,6 @@ class Performance_AppraisalsController extends Controller
                             ->where('end_date','>=',$creationDate)
                             ->first();
         
-        // $evaluationItems = Evaluation_period::pluck('evaluation_period', 'id')->reverse()->toArray();
         $evaluationItems = Evaluation_period::orderBy('id', 'desc')->pluck('evaluation_period', 'id')->toArray();
         if(count($evaluation) > 0) {
             $evaluationStatus = $evaluation->status;
@@ -76,10 +75,20 @@ class Performance_AppraisalsController extends Controller
         
         $teams = array();
         
-        $this->getMembers( $userId);
-        $teams = $this->members;
+        if (Entrust::hasRole('SUPER_ADMIN')) {
+            $teamMembers = DB::select("SELECT id FROM employees WHERE deleted_at is NULL");
+            foreach ($teamMembers as $user) {
+                array_push( $teams, $user->id );
+            }
+            
+        }
+        else {
+                $this->getMembers( $userId);
+                $teams = $this->members;
+        }
+        
         array_push($teams, $userId);
-    
+      
         $docuemntCount = DB::table('Performance_Appraisals_details')->select('id')
                         ->whereNull('deleted_at')
                         ->whereIn('manager_id', $teams)
@@ -923,7 +932,7 @@ class Performance_AppraisalsController extends Controller
         $teamMemberIds = array();
         
         if (Entrust::hasRole('SUPER_ADMIN')) {
-            $teamMembers = DB::select("select id from employees ");
+            $teamMembers = DB::select("SELECT id FROM employees WHERE deleted_at is NULL ");
             foreach ($teamMembers as $user) {
                 array_push( $teamMemberIds, $user->id );
             }
@@ -979,9 +988,9 @@ class Performance_AppraisalsController extends Controller
                     else if($col == 'id' )
                         $data->data[$i][$j] = '';
                         
-                        if($col == 'manager')
+                         if($col == 'manager')
                             $data->data[$i][$j] = $this->getManager($data->data[$i][$j]);
-                            
+                             
                             if($col == 'employee') {
                                 
                                 $data->data[$i][$j] = '<a href="'.url('/performance_appraisals/'.$id).'">'.$data->data[$i][$j].'</a>';
@@ -1015,7 +1024,7 @@ class Performance_AppraisalsController extends Controller
                 $status = '';
                 switch ($data->data[$i][7]) {
                     case 0:
-                        $status = 'Goal setting is in progress.';
+                        $status = 'Goal setting is in progress';
                         break ;
                     case 1:
                         $status = 'Goal settings is completed by Appraisee';
@@ -1059,7 +1068,7 @@ class Performance_AppraisalsController extends Controller
         // $insert_id = Module::updateRow("Performance_Appraisals", $request);
         $ids = $request->input( 'ids' );
         $ids = explode(",", $ids);
-        $status = DB::table('Performance_Appraisals')
+        $status = DB::table('Performance_Appraisals_details')
         ->whereIn('id', $ids)
         ->update(['status' => 7]);
         echo $status;
@@ -1097,9 +1106,9 @@ class Performance_AppraisalsController extends Controller
         $rating = 0;
         $performance_appraisal = Performance_Appraisal::find($profileId);
         $memberCount           = DB::table('employees')->select('id')
-        ->whereNull('deleted_at')
-        ->where('manager', '=', $employeeId)
-        ->count();
+								->whereNull('deleted_at')
+								->where('manager', '=', $employeeId)
+								->count();
         $cnt  = 0;
         for ($i= 1; $i <= 10; $i++) {
             if(( ($performance_appraisal->{'goal_'.$i}  != 'N/A' && $performance_appraisal->{'goal_'.$i}  != '') &&  $performance_appraisal->{'manager_only_'.$i} == "No" ) || ( trim($performance_appraisal->{'manager_only_'.$i} ) == "Yes" && $memberCount > 0 )) {
@@ -1115,15 +1124,16 @@ class Performance_AppraisalsController extends Controller
     public function getMembers($employeeId ) {
         
         $child = DB::table('employees')
-        ->select('id')
-        ->whereNull('deleted_at')
-        ->whereNull('date_left')
-        ->where('manager','=', $employeeId)
-        ->orderBy('id', 'desc')
-        ->get();
+				->select('id')
+				->whereNull('deleted_at')
+				->whereNull('date_left')
+				->where('manager','=', $employeeId)
+				->orderBy('id', 'desc')
+				->get();
         foreach($child as $ch) {
             array_push($this->members, $ch->id);
-            $this->getMembers($ch->id);
+            if($employeeId != $ch->id)
+                $this->getMembers($ch->id);
         }
         
     }
