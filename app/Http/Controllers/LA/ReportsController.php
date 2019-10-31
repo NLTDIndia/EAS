@@ -24,7 +24,7 @@ class ReportsController extends Controller
     public $show_action = true;
     public $members = array();
     public $listing_cols = ['id' ];
-    public $listing_cols_data_table = ['id', 'employee id', 'employee', 'department', 'manager', 'evaluation period', 'start date', 'end date', 'status'];
+    public $listing_cols_data_table = ['doc id', 'emp id', 'employee', 'dept', 'manager', 'evaluation period', 'start date', 'end date', 'status'];
     
      /**
      * Create a new controller instance.
@@ -213,6 +213,8 @@ class ReportsController extends Controller
                                 ->first();
             $evaluationId       = $evaluation->id;
             $evaluationStatus   = $evaluation->status;
+            $evaluationPeriod  = $evaluation->evaluation_period;
+            $lastEligibleDay   = strstr($evaluationPeriod, '-', true)."-12-31";
         }
         else
         {
@@ -230,10 +232,13 @@ class ReportsController extends Controller
                                     ->first();
                 $evaluationId       = $evaluation->id;
                 $evaluationStatus   = $evaluation->status;
+                $evaluationPeriod  = $evaluation->evaluation_period;
+                $lastEligibleDay   = strstr($evaluationPeriod, '-', true)."-12-31";
             } else
             {
                 $evaluationId       = 0;
                 $evaluationStatus   = "";
+                $lastEligibleDay    = "";
                 
             }
         }
@@ -263,21 +268,23 @@ class ReportsController extends Controller
                     DB::Raw('IFNULL(`performance_appraisals_details`.`end_date`, (SELECT `end_date` FROM evaluation_periods WHERE id = '.$evaluationId.'))'),
                     DB::Raw('IFNULL(`performance_appraisals_details`.`status`, "-1" )'))
                     ->whereNull('employees.deleted_at')
+                    ->where('employees.date_hire', '<=', $lastEligibleDay)
                     ->whereNull('performance_appraisals.deleted_at')
                     ->where('evaluation_periods.id', '=',$evaluationId)
                     ->orWhere('performance_appraisals_details.evaluation_period', '=',null)
                     ->whereNull('employees.deleted_at')
+                    ->where('employees.date_hire', '<=', $lastEligibleDay)
                     ->whereNull('performance_appraisals.deleted_at'); 
-        
         $out = Datatables::of($values)->make();
         $data = $out->getData();
         
         for($i=0; $i < count($data->data); $i++) {
             for ($j=0; $j < count($this->listing_cols_data_table); $j++) {
-                if($j== 0) {
-                    $id =  $data->data[$i][0];
-                    
-                }
+               /*  if($j== 0) {
+                    if( $data->data[$i][$j] == 0 ||  $data->data[$i][$j] == null ) 
+                        $id = '#';
+                    else $id =  $data->data[$i][0];
+                } */
                 $col = $this->listing_cols_data_table[$j];
                 
                         if($col == 'manager')
@@ -288,11 +295,6 @@ class ReportsController extends Controller
             if($this->show_action) {
                 $output = '';
                
-                
-                if($col == 'employee') {
-                    
-                    $data->data[$i][$j] = '<a href="'.url( '/performance_appraisals/'.$id).'">'.$data->data[$i][$j].'</a>';
-                }
                 // Appraisal status
                 $status = '';
                 switch ($data->data[$i][8]) {
@@ -325,7 +327,12 @@ class ReportsController extends Controller
                         break ;
                 }
                 if($data->data[$i][0] == 0 || $data->data[$i][0] == null) 
-                    $status = 'Goal setting is not started.';
+                {
+                    $status = 'Goal setting is not started';
+                    $data->data[$i][0] = '#';
+                }
+                else 
+                    $data->data[$i][0] = '<a target="_blank" href="'.url( '/performance_appraisals/'.$data->data[$i][0]).'">'.$data->data[$i][0].'</a>';
                 
                 $data->data[$i][8] = $status;
                 
