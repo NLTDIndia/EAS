@@ -394,13 +394,20 @@ $('#example1 tbody').on('change', 'input[type="checkbox"]', function() {
          url: "{{ url('/add_employee_performance_ajax') }}",
          data: {ids: ids, evaluationPeriod: {{$evaluationId}}, startDate: startDate, endDate: endDate},
          success: function( msg ) {
-         	$('#example-select-all').prop("checked", false);
-         	bootbox.alert('The record has been successfully updated.');
-         	table.ajax.reload();
-         	$("#start_date").val('');
-         	$("#end_date").val('');
-         	$('#date-range').modal('hide');
-            console.log(msg);
+            msg = JSON.parse(msg);
+         	if(msg.status == 'success') {
+         		$('#example-select-all').prop("checked", false);
+             	bootbox.alert(msg.data);
+             	table.ajax.reload();
+             	$("#start_date").val('');
+             	$("#end_date").val('');
+             	$('#date-range').modal('hide');
+                console.log(msg);
+         	}
+         	else {
+         		bootbox.alert(msg.data);
+             	console.log(msg);
+         	} 
          }
      });
  }
