@@ -69,7 +69,7 @@
 									@php
 										switch($record->status) {
 											case 0:
-                                                 $status = 'Goal setting is in progress.';
+                                                 $status = 'Goal setting is in progress';
                                                  break ;
                                              case 1:
                                                  $status = 'Goal settings is completed by Appraisee';
