@@ -96,7 +96,7 @@
     			search: "_INPUT_",
     			searchPlaceholder: "Search"
     		},
-    		  columnDefs: [  {visible:false, targets:[0]}],
+    		  columnDefs: [  { "width": "10%", "targets":6 }, { "width": "10%", "targets": 7 },  { "width": "20%", "targets":8}  ],
     		  dom: "<'row'<'col-md-4'l>><'row'<'col-md-8'B><'col-md-4'f>>" +'rtip',
     		  buttons: [
 					{ extend: 'excelHtml5',filename: '<?php echo "EAS Documents -".date("d-m-Y"); ?>',exportOptions:{columns: [1, 2, 3, 4, 5, 6, 7, 8]}},
