@@ -993,7 +993,7 @@ class Performance_AppraisalsController extends Controller
                              
                             if($col == 'employee') {
                                 
-                                $data->data[$i][$j] = '<a href="'.url('/performance_appraisals/'.$id).'">'.$data->data[$i][$j].'</a>';
+                                $data->data[$i][$j] = '<a target="_blank" href="'.url('/performance_appraisals/'.$id).'">'.$data->data[$i][$j].'</a>';
                             }
                             
             }
@@ -1010,16 +1010,13 @@ class Performance_AppraisalsController extends Controller
                         $output .= '<a title="Edit" href="'.url('/performance_appraisals/'.$id.'/edit').'" class="btn btn-warning btn-xs" style="display:inline;padding:2px 5px 3px 5px;"><i class="fa fa-edit"></i></a>';
                 }
                 
-                if(Module::hasAccess("Performance_Appraisals", "delete") && $data->data[$i][7] != 7) {
+                if(Entrust::hasRole('SUPER_ADMIN') && Module::hasAccess("Performance_Appraisals", "delete") && $data->data[$i][7] != 7) {
                     $output .= Form::open(['route' => [ 'performance_appraisals.destroy', $id], 'method' => 'delete', 'style'=>'display:inline']);
                     $output .= ' <button title="Delete" class="btn btn-danger btn-xs btn-delete" type="button"><i class="fa fa-times"></i></button>';
                     $output .= Form::close();
                 }
                 
-                if($col == 'employee') {
-                    
-                    $data->data[$i][$j] = '<a href="'.url( '/performance_appraisals/'.$id).'">'.$data->data[$i][$j].'</a>';
-                }
+              
                 // Appraisal status
                 $status = '';
                 switch ($data->data[$i][7]) {
