@@ -446,11 +446,9 @@ class EmployeesController extends Controller
                                 $data->data[$i][0] = '';
                                 
                                 if($col == $this->view_col) {
-                                    $data->data[$i][$j] = '<a href="'.url( '/employees/'.$id).'">'.$data->data[$i][$j].'</a>';
+                                    $data->data[$i][$j] = '<a target="_blank" href="'.url( '/employees/'.$id).'">'.$data->data[$i][$j].'</a>';
                                 }
-                                
-                                
-                        }
+                         }
                         
                         if($this->show_action) {
                             $output = '';
@@ -479,13 +477,6 @@ class EmployeesController extends Controller
                 $where = " WHERE deleted_at IS NULL ";
                 else
                     $where  = " WHERE date_left IS NULL and deleted_at IS NULL ";
-                    
-                    /*
-                     $values = DB::select("select ".$cols." from (select * from employees $where order by manager, emp_id) employees ,
-                     (select @pv := $userId) initialisation where find_in_set(manager, @pv) > 0 and @pv := concat(@pv, ',', id)");
-                     
-                     */
-                    
                     $this->getMembers( $userId);
                     $memCondition = " ";
                     $mem = implode("," , $this->members);
@@ -508,17 +499,10 @@ class EmployeesController extends Controller
                                     $data->data[$i][$j] = ModuleFields::getFieldValue($fields_popup[$col], $data->data[$i][$j]);
                                 }
                                 if($col == $this->view_col) {
-                                    $data->data[$i][$j] = '<a href="'.url('/employees/'.$data->data[$i][0]).'">'.$data->data[$i][$j].'</a>';
+                                    $data->data[$i][$j] = '<a target="_blank" href="'.url('/employees/'.$data->data[$i][0]).'">'.$data->data[$i][$j].'</a>';
                                 }
-                                
                             }
-                            /*
-                             if($col == 'is_allowed' && $data->data[$i][9] == 1)
-                             $data->data[$i][9] = 'Yes';
-                             else if($col == 'is_allowed' )
-                             $data->data[$i][9] = ''; */
-                             
-                             if($this->show_action) {
+                          if($this->show_action) {
                                  $output = '';
                                  if(Module::hasAccess("Employees", "edit")) {
                                      $output .= '<a title="Edit" href="'.url('/employees/'.$data->data[$i][0].'/edit').'" class="btn btn-warning btn-xs" style="display:inline;padding:2px 5px 3px 5px;"><i class="fa fa-edit"></i></a>';
@@ -580,70 +564,72 @@ class EmployeesController extends Controller
      */
     public function addPerformanceAjax(Request $request)  {
         
-        
+        $result = array ('status'=> 'success',  'data' => 'The record has been successfully updated');
         $startDate =  implode("-", array_reverse(explode("/", $request->startDate)));
         $endDate   =  implode("-", array_reverse(explode("/", $request->endDate)));
-        $ids = $request->input( 'ids' );
-        $ids = explode(",", $ids);
-        $now = date("Y-m-d H:i:s");
-        foreach ($ids as $id) {
+        if($endDate >= $startDate) {
             
-            $employees =  DB::table('employees')->where([
-                ['id', '=', $id],
-            ])->first();
-            
-            $dataCount =   DB::table('performance_appraisals_details')
-            ->whereNull('deleted_at')
-            ->where('evaluation_period','=', $request->evaluationPeriod)
-            ->where('employee_id','=',$id)
-            ->where('is_allowed','=', 1)
-            ->count();
-            if($dataCount == 0)   {
+            $ids = $request->input( 'ids' );
+            $ids = explode(",", $ids);
+            $now = date("Y-m-d H:i:s");
+            foreach ($ids as $id) {
                 
-                $dataCount1 =  DB::table('performance_appraisals_details')
-                ->select('id')
+                $employees =  DB::table('employees')->where([
+                    ['id', '=', $id],
+                ])->first();
+                
+                $dataCount =   DB::table('performance_appraisals_details')
                 ->whereNull('deleted_at')
-                ->where('employee_id','=', $id)
+                ->where('evaluation_period','=', $request->evaluationPeriod)
+                ->where('employee_id','=',$id)
+                ->where('is_allowed','=', 1)
                 ->count();
-                if( $dataCount1 !=0 ) {
-                    // Update the end date of last performance appraisal record
-                    $recordId = DB::table('performance_appraisals_details')
+                if($dataCount == 0)   {
+                    
+                    $dataCount1 =  DB::table('performance_appraisals_details')
                     ->select('id')
                     ->whereNull('deleted_at')
                     ->where('employee_id','=', $id)
-                    ->orderBy('id', 'desc')
-                    ->first();
-                    //Set end date as previous day of the current start day
-                    $previousRecordEndDate = date('Y-m-d', strtotime('-1 day', strtotime($startDate)));
-                    DB::table('performance_appraisals_details')
-                    ->where('id', $recordId->id)
-                    ->update(['end_date' => $previousRecordEndDate, 'updated_at' => $now]);
-                }
-                if($request->evaluationPeriod > 0) {
-                    DB::table('performance_appraisals_details')->insert([
-                        'employee_id' => $id,
-                        'manager_id' => $employees->manager,
-                        'department' => $employees->dept,
-                        'evaluation_period' => $request->evaluationPeriod,
-                        'performance_appraisals_id' => 0,
-                        'start_date' => $startDate,
-                        'end_date' => $endDate,
-                        'steps'    => 0,
-                        'status' => 0,
-                        'is_allowed' => 1,
-                        'created_at' => $now,
-                        'updated_at' => $now
-                    ]);
-                }
-                
-                
+                    ->count();
+                    if( $dataCount1 !=0 ) {
+                        // Update the end date of last performance appraisal record
+                        $recordId = DB::table('performance_appraisals_details')
+                        ->select('id')
+                        ->whereNull('deleted_at')
+                        ->where('employee_id','=', $id)
+                        ->orderBy('id', 'desc')
+                        ->first();
+                        //Set end date as previous day of the current start day
+                        $previousRecordEndDate = date('Y-m-d', strtotime('-1 day', strtotime($startDate)));
+                        DB::table('performance_appraisals_details')
+                        ->where('id', $recordId->id)
+                        ->update(['end_date' => $previousRecordEndDate, 'updated_at' => $now]);
+                    }
+                    if($request->evaluationPeriod > 0) {
+                      $rowId  = DB::table('performance_appraisals_details')->insert([
+                            'employee_id' => $id,
+                            'manager_id' => $employees->manager,
+                            'department' => $employees->dept,
+                            'evaluation_period' => $request->evaluationPeriod,
+                            'performance_appraisals_id' => 0,
+                            'start_date' => $startDate,
+                            'end_date' => $endDate,
+                            'steps'    => 0,
+                            'status' => 0,
+                            'is_allowed' => 1,
+                            'created_at' => $now,
+                            'updated_at' => $now
+                        ]);
+                      $result = array ('status'=> 'success',  'data' => 'The record has been successfully updated.');
+                    }
+                 }
+              }
             }
-            
-            
-            
-        }
-        
-        
+            else {
+                $result = array ('status'=> 'error',  'data' => 'End date should be equal or greater than Start date.');
+               
+            }
+            echo json_encode($result);
     }
     
     
@@ -701,14 +687,6 @@ class EmployeesController extends Controller
                 $date_append = date("Y-m-d-His");
                 $path_parts = pathinfo(storage_path('uploads/'.$filename));
                 $newFileName = $path_parts['filename']."-".$date_append.".".$path_parts['extension'];
-                //Checking whether the file is exists or not
-                /*if(file_exists(storage_path('uploads/'.$filename))) {
-                
-                // rename(storage_path('uploads/'.$filename), storage_path('uploads/'.$newFileName) );
-                }*/
-                
-                
-                //$upload_success = Input::file('file')->move($folder, $date_append.$filename);
                 $upload_success = Input::file('employeeFile')->move($folder, $newFileName);
                 if( $upload_success ) {
                     $file = 'storage/uploads/'.$newFileName;
